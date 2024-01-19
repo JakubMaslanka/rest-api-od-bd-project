@@ -1,0 +1,54 @@
+version: '3'
+
+services:
+  db:
+    container_name: postgresql_db
+    image: postgres
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: Ahe2024
+    networks:
+      - postgres
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  pgadmin:
+    container_name: postgresql_gui
+    image: dpage/pgadmin4
+    restart: always
+    ports:
+      - "${PGADMIN_PORT:-5050}:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: Ahe2024
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    networks:
+      - postgres
+    depends_on: [db]
+
+
+  # app:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   container_name: nest_app
+  #   ports:
+  #     - '3000:3000'
+  #   depends_on:
+  #     - db
+  #   volumes:
+  #     - ./src:/app/src
+
+networks:
+  postgres:
+    driver: bridge
+
+volumes:
+  db:
+  pgadmin:
