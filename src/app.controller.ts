@@ -1,5 +1,4 @@
-import { Controller, Get, Request, UseGuards } from "@nestjs/common";
-import { AccessTokenGuard } from "@/common/guards";
+import { Controller, Get } from "@nestjs/common";
 
 @Controller()
 export class AppController {
@@ -12,11 +11,5 @@ export class AppController {
 			// eslint-disable-next-line @typescript-eslint/no-var-requires
 			version: require("../package.json").version
 		};
-	}
-
-	@UseGuards(AccessTokenGuard)
-	@Get("profile")
-	getProfile(@Request() req) {
-		return req.user;
 	}
 }

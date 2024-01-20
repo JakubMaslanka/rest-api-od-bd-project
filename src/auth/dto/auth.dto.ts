@@ -1,4 +1,4 @@
-import { IsString } from "class-validator";
+import { IsEmail, IsString } from "class-validator";
 import { UserRole } from "@/users/entities/user.entity";
 
 export type JwtPayload = {
@@ -8,6 +8,7 @@ export type JwtPayload = {
 };
 
 export class AuthDto {
+	@IsEmail()
 	@IsString()
 	email: string;
 

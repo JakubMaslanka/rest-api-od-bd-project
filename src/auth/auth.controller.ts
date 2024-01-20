@@ -1,15 +1,13 @@
 import { Request } from "express";
 import { Controller, Get, Post, Body, Req, UseGuards } from "@nestjs/common";
-import { AuthService } from "./Auth.service";
 import { AccessTokenGuard, RefreshTokenGuard } from "@/common";
 import { CreateUserDto } from "@/users/dto/create-user.dto";
+import { AuthService } from "./auth.service";
 import { AuthDto } from "./dto/auth.dto";
 
 @Controller("auth")
 export class AuthController {
-	constructor(private readonly authService: AuthService) {
-		console.log(this.authService);
-	}
+	constructor(private readonly authService: AuthService) {}
 
 	@Post("signup")
 	signup(@Body() createUserDto: CreateUserDto) {
@@ -24,9 +22,15 @@ export class AuthController {
 	@UseGuards(RefreshTokenGuard)
 	@Get("refresh")
 	refreshTokens(@Req() req: Request) {
-		const userId = req.user["sub"];
+		const userEmail = req.user["email"];
 		const refreshToken = req.user["refreshToken"];
-		return this.authService.refreshTokens(userId, refreshToken);
+		return this.authService.refreshTokens(userEmail, refreshToken);
+	}
+
+	@UseGuards(AccessTokenGuard)
+	@Get("profile")
+	getProfile(@Req() req) {
+		return req.user;
 	}
 
 	@UseGuards(AccessTokenGuard)

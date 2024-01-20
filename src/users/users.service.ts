@@ -1,9 +1,9 @@
-import { uuid } from "uuidv4";
+import { v4 as uuid } from "uuid";
 import { Injectable, Logger } from "@nestjs/common";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { UsersRepository } from "./users.repository";
-import { UserRole } from "./entities/user.entity";
+import { User, UserRole } from "./entities/user.entity";
 
 @Injectable()
 export class UsersService {
@@ -12,23 +12,32 @@ export class UsersService {
 	constructor(private readonly usersRepository: UsersRepository) {}
 
 	create(createUserDto: CreateUserDto) {
-		return this.usersRepository.create({
+		const user = new User({
 			...createUserDto,
 			id: uuid(),
-			role: UserRole.User
+			role: UserRole.User,
+			refreshToken: ""
 		});
+		return this.usersRepository.create(user);
 	}
 
 	findAll() {
-		return this.usersRepository.find({});
+		const users = this.usersRepository.find({});
+		return users;
 	}
 
-	findOne(id: string) {
-		return this.usersRepository.findOne({ id });
+	async findOne(id: string) {
+		const user = await this.usersRepository.findOne({ id });
+		return user;
 	}
 
-	findOneByEmail(email: string) {
-		return this.usersRepository.findOne({ email });
+	async findOneByEmail(email: string) {
+		try {
+			const users = await this.usersRepository.find({ email });
+			return users[0];
+		} catch (error) {
+			return null;
+		}
 	}
 
 	update(id: string, updateUserDto: UpdateUserDto) {

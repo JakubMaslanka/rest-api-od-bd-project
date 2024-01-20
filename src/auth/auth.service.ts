@@ -1,5 +1,5 @@
 import * as bcrypt from "bcrypt";
-import { BadRequestException, ForbiddenException, Injectable } from "@nestjs/common";
+import { BadRequestException, ForbiddenException, HttpStatus, Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 import { CreateUserDto } from "@/users/dto/create-user.dto";
@@ -33,6 +33,7 @@ export class AuthService {
 			email: newUser.email,
 			role: newUser.role
 		});
+
 		await this.updateRefreshToken(newUser.id, tokens.refreshToken);
 
 		return tokens;
@@ -43,7 +44,7 @@ export class AuthService {
 		const user = await this.usersService.findOneByEmail(data.email);
 		if (!user) throw new BadRequestException("User does not exist");
 
-		const passwordMatches = await bcrypt.compare(user.password, data.password);
+		const passwordMatches = await bcrypt.compare(data.password, user.password);
 		if (!passwordMatches) throw new BadRequestException("Password is incorrect");
 
 		const tokens = await this.getTokens({ sub: user.id, email: user.email, role: user.role });
@@ -57,9 +58,10 @@ export class AuthService {
 		refreshToken: string
 	): Promise<ReturnType<typeof this.getTokens>> {
 		const user = await this.usersService.findOneByEmail(email);
+
 		if (!user || !user.refreshToken) throw new ForbiddenException("Access Denied");
 
-		const refreshTokenMatches = await bcrypt.compare(user.refreshToken, refreshToken);
+		const refreshTokenMatches = await bcrypt.compare(refreshToken, user.refreshToken);
 		if (!refreshTokenMatches) throw new ForbiddenException("Access Denied");
 
 		const tokens = await this.getTokens({ sub: user.id, email: user.email, role: user.role });
@@ -69,7 +71,8 @@ export class AuthService {
 	}
 
 	public async logout(userId: string) {
-		return this.usersService.update(userId, { refreshToken: null });
+		await this.usersService.update(userId, { refreshToken: null });
+		return HttpStatus.OK;
 	}
 
 	private async hashData(data: string) {

@@ -3,7 +3,9 @@ import {
 	Column,
 	CreateDateColumn,
 	UpdateDateColumn,
-	PrimaryGeneratedColumn
+	PrimaryGeneratedColumn,
+	Index
+
 	// OneToMany,
 } from "typeorm";
 import { AbstractEntity } from "@/common";
@@ -27,6 +29,7 @@ export class User extends AbstractEntity<User> {
 	@Column()
 	lastName: string;
 
+	@Index({ unique: true })
 	@Column({ unique: true })
 	email: string;
 
