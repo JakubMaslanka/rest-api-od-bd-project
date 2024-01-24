@@ -17,6 +17,7 @@ export class AccessTokenGuard extends AuthGuard("jwt") {
 		if (shouldSkipAuth) {
 			return true;
 		}
+
 		return super.canActivate(context);
 	}
 }

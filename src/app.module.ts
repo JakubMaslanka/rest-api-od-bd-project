@@ -1,13 +1,12 @@
 import { Module } from "@nestjs/common";
+import { APP_GUARD } from "@nestjs/core";
 import { ConfigModule } from "@nestjs/config";
 import { TypeOrmModule } from "@nestjs/typeorm";
-import { AppController } from "./app.controller";
-import { LoggerModule } from "@/common/logger/logger.module";
-import { DatabaseModule } from "@/common/database/database.module";
+import { LoggerModule, DatabaseModule, AccessTokenGuard } from "@/common";
 import { AuthModule } from "@/auth/auth.module";
 import { UsersModule } from "@/users/users.module";
 import { TicketsModule } from "@/tickets/tickets.module";
-import { MessagesModule } from "@/messages/messages.module";
+import { AppController } from "./app.controller";
 
 @Module({
 	imports: [
@@ -19,8 +18,13 @@ import { MessagesModule } from "@/messages/messages.module";
 		DatabaseModule,
 		UsersModule,
 		AuthModule,
-		TicketsModule,
-		MessagesModule
+		TicketsModule
+	],
+	providers: [
+		{
+			provide: APP_GUARD,
+			useClass: AccessTokenGuard
+		}
 	],
 	controllers: [AppController]
 })

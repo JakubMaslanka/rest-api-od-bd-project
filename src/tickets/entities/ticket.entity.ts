@@ -4,18 +4,26 @@ import {
 	CreateDateColumn,
 	UpdateDateColumn,
 	PrimaryGeneratedColumn,
-	OneToMany,
 	Index,
-	JoinTable
+	ManyToOne
 } from "typeorm";
+import { ApiProperty } from "@nestjs/swagger";
 import { AbstractEntity } from "@/common";
-import { Message } from "@/messages/entities/message.entity";
+import { User } from "@/users/entities/user.entity";
 
 export enum TicketStatus {
 	Open = "open",
 	InProgress = "in_progress",
 	WaitingForCustomer = "waiting_for_customer",
 	Closed = "closed"
+}
+
+export interface Message {
+	id: string;
+	content: string;
+	senderUserId: User["id"];
+	isDeleted: boolean;
+	createdAt?: Date;
 }
 
 @Entity()
@@ -37,15 +45,17 @@ export class Ticket extends AbstractEntity<Ticket> {
 	})
 	status: TicketStatus;
 
-	@Column()
-	creatorId: string;
+	@Column({ type: "json", nullable: true })
+	@ApiProperty({
+		isArray: true
+	})
+	messages?: Message[];
 
-	@Column({ nullable: true })
-	assignId?: string | null;
+	@ManyToOne(() => User, (user) => user.createdTickets, { onDelete: "SET NULL" })
+	creatorId: User["id"] | null;
 
-	@JoinTable()
-	@OneToMany(() => Message, (message) => message.ticket, { cascade: true })
-	messages: Message[];
+	@ManyToOne(() => User, (user) => user.assignedTickets, { onDelete: "SET NULL" })
+	assignId: User["id"] | null;
 
 	@CreateDateColumn({ type: "timestamp", default: () => "CURRENT_TIMESTAMP(6)" })
 	createdAt?: Date;

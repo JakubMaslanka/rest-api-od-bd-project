@@ -9,7 +9,6 @@ import {
 } from "typeorm";
 import { AbstractEntity } from "@/common";
 import { Ticket } from "@/tickets/entities/ticket.entity";
-import { Message } from "@/messages/entities/message.entity";
 
 export enum UserRole {
 	User = "user",
@@ -42,8 +41,8 @@ export class User extends AbstractEntity<User> {
 	})
 	role: UserRole;
 
-	@Column()
-	refreshToken: string;
+	@Column({ type: "text", unique: true, nullable: true })
+	refreshToken: string | null;
 
 	@CreateDateColumn({ type: "timestamp", default: () => "CURRENT_TIMESTAMP(6)" })
 	createdAt?: Date;
@@ -60,7 +59,4 @@ export class User extends AbstractEntity<User> {
 
 	@OneToMany(() => Ticket, (ticket) => ticket.assignId)
 	assignedTickets: Ticket[];
-
-	@OneToMany(() => Message, (message) => message.user)
-	messages: Message[];
 }

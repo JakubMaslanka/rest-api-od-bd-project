@@ -11,6 +11,10 @@ export abstract class AbstractRepository<T extends AbstractEntity<T>> {
 		private readonly entityManager: EntityManager
 	) {}
 
+	protected get repository(): Repository<T> {
+		return this.entityRepository;
+	}
+
 	async create(entity: T): Promise<T> {
 		return this.entityManager.save(entity);
 	}

@@ -15,7 +15,8 @@ import { EntityClassOrSchema } from "@nestjs/typeorm/dist/interfaces/entity-clas
 				username: configService.getOrThrow<string>("DB_USERNAME"),
 				password: configService.getOrThrow<string>("DB_PASSWORD"),
 				synchronize: process.env.NODE_ENV !== "production",
-				autoLoadEntities: true
+				autoLoadEntities: true,
+				logging: process.env.NODE_ENV !== "production" && process.env.NODE_ENV !== "test"
 			}),
 			inject: [ConfigService]
 		})

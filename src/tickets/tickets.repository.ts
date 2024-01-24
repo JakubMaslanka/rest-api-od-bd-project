@@ -10,17 +10,34 @@ export class TicketsRepository extends AbstractRepository<Ticket> {
 
 	constructor(
 		@InjectRepository(Ticket)
-		readonly ticketsRepository: Repository<Ticket>,
+		ticketsRepository: Repository<Ticket>,
 		entityManager: EntityManager
 	) {
 		super(ticketsRepository, entityManager);
 	}
 
-	async findTicketWithDetails(ticketId: string): Promise<Ticket | undefined> {
-		return this.ticketsRepository
+	async findTicketsWithUsers(): Promise<Ticket[]> {
+		return this.repository
 			.createQueryBuilder("ticket")
-			.leftJoinAndSelect("ticket.messages", "message")
-			.where("ticket.id = :ticketId", { ticketId })
-			.getOne();
+			.leftJoinAndSelect("ticket.creatorId", "creatorId")
+			.leftJoinAndSelect("ticket.assignId", "assignId")
+			.select([
+				"ticket.id",
+				"ticket.title",
+				"ticket.description",
+				"ticket.messages",
+				"ticket.status",
+				"ticket.createdAt",
+				"ticket.updatedAt",
+				"creatorId.id",
+				"creatorId.email",
+				"creatorId.firstName",
+				"creatorId.lastName",
+				"assignId.id",
+				"assignId.email",
+				"assignId.firstName",
+				"assignId.lastName"
+			])
+			.getMany();
 	}
 }

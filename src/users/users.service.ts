@@ -22,7 +22,7 @@ export class UsersService {
 	}
 
 	findAll() {
-		return this.usersRepository.find({});
+		return this.usersRepository.findUsersWithTickets();
 	}
 
 	async findOne(id: string) {

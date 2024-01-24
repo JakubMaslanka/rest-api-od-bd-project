@@ -1,14 +1,5 @@
-import {
-	IsEnum,
-	IsInstance,
-	IsOptional,
-	IsString,
-	IsUUID,
-	MaxLength,
-	MinLength
-} from "class-validator";
+import { IsEnum, IsOptional, IsString, IsUUID, MaxLength, MinLength } from "class-validator";
 import { TicketStatus } from "../entities/ticket.entity";
-import { Message } from "@/messages/entities/message.entity";
 
 export class CreateTicketDto {
 	@MinLength(5)
@@ -26,8 +17,4 @@ export class CreateTicketDto {
 	@IsString()
 	@IsUUID()
 	assignId?: string = null;
-
-	@IsOptional()
-	@IsInstance(Message)
-	messages: Message[] = [];
 }
