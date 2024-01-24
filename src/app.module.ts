@@ -6,8 +6,8 @@ import { LoggerModule } from "@/common/logger/logger.module";
 import { DatabaseModule } from "@/common/database/database.module";
 import { AuthModule } from "@/auth/auth.module";
 import { UsersModule } from "@/users/users.module";
-// import { TicketsModule } from "@/tickets/tickets.module";
-// import { MessagesModule } from "@/messages/messages.module";
+import { TicketsModule } from "@/tickets/tickets.module";
+import { MessagesModule } from "@/messages/messages.module";
 
 @Module({
 	imports: [
@@ -18,9 +18,9 @@ import { UsersModule } from "@/users/users.module";
 		LoggerModule,
 		DatabaseModule,
 		UsersModule,
-		AuthModule
-		// TicketsModule,
-		// MessagesModule,
+		AuthModule,
+		TicketsModule,
+		MessagesModule
 	],
 	controllers: [AppController]
 })

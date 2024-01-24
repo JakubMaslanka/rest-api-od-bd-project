@@ -4,13 +4,12 @@ import {
 	CreateDateColumn,
 	UpdateDateColumn,
 	PrimaryGeneratedColumn,
-	Index
-
-	// OneToMany,
+	Index,
+	OneToMany
 } from "typeorm";
 import { AbstractEntity } from "@/common";
-// import { Ticket } from "@/tickets/entities/ticket.entity";
-// import { Message } from "@/messages/entities/message.entity";
+import { Ticket } from "@/tickets/entities/ticket.entity";
+import { Message } from "@/messages/entities/message.entity";
 
 export enum UserRole {
 	User = "user",
@@ -56,9 +55,12 @@ export class User extends AbstractEntity<User> {
 	})
 	updatedAt?: Date;
 
-	// @OneToMany(() => Ticket, (ticket) => ticket.user, { cascade: true })
-	// tickets: Ticket[];
+	@OneToMany(() => Ticket, (ticket) => ticket.creatorId)
+	createdTickets: Ticket[];
 
-	// @OneToMany(() => Message, (message) => message.user, { cascade: true })
-	// messages: Message[];
+	@OneToMany(() => Ticket, (ticket) => ticket.assignId)
+	assignedTickets: Ticket[];
+
+	@OneToMany(() => Message, (message) => message.user)
+	messages: Message[];
 }

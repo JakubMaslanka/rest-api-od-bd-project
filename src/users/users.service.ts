@@ -22,8 +22,7 @@ export class UsersService {
 	}
 
 	findAll() {
-		const users = this.usersRepository.find({});
-		return users;
+		return this.usersRepository.find({});
 	}
 
 	async findOne(id: string) {

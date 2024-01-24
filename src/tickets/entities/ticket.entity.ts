@@ -3,12 +3,13 @@ import {
 	Column,
 	CreateDateColumn,
 	UpdateDateColumn,
-	PrimaryGeneratedColumn
-	// ManyToOne,
-	// OneToMany,
+	PrimaryGeneratedColumn,
+	OneToMany,
+	Index,
+	JoinTable
 } from "typeorm";
-// import { User } from "src/users/entities/user.entity";
-// import { Message } from "src/messages/entities/message.entity";
+import { AbstractEntity } from "@/common";
+import { Message } from "@/messages/entities/message.entity";
 
 export enum TicketStatus {
 	Open = "open",
@@ -18,7 +19,8 @@ export enum TicketStatus {
 }
 
 @Entity()
-export class Ticket {
+export class Ticket extends AbstractEntity<Ticket> {
+	@Index({ unique: true })
 	@PrimaryGeneratedColumn("uuid")
 	id: string;
 
@@ -28,9 +30,6 @@ export class Ticket {
 	@Column("text")
 	description: string;
 
-	// @ManyToOne(() => User, (user) => user.tickets)
-	// user: User;
-
 	@Column({
 		type: "enum",
 		enum: TicketStatus,
@@ -38,12 +37,23 @@ export class Ticket {
 	})
 	status: TicketStatus;
 
-	// @OneToMany(() => Message, (message) => message.ticket)
-	// messages: Message[];
+	@Column()
+	creatorId: string;
 
-	@CreateDateColumn()
-	createdAt: Date;
+	@Column({ nullable: true })
+	assignId?: string | null;
 
-	@UpdateDateColumn()
-	updatedAt: Date;
+	@JoinTable()
+	@OneToMany(() => Message, (message) => message.ticket, { cascade: true })
+	messages: Message[];
+
+	@CreateDateColumn({ type: "timestamp", default: () => "CURRENT_TIMESTAMP(6)" })
+	createdAt?: Date;
+
+	@UpdateDateColumn({
+		type: "timestamp",
+		default: () => "CURRENT_TIMESTAMP(6)",
+		onUpdate: "CURRENT_TIMESTAMP(6)"
+	})
+	updatedAt?: Date;
 }

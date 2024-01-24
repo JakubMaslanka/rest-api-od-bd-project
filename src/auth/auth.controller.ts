@@ -29,7 +29,7 @@ export class AuthController {
 
 	@UseGuards(AccessTokenGuard)
 	@Get("profile")
-	getProfile(@Req() req) {
+	getProfile(@Req() req: Request) {
 		return req.user;
 	}
 

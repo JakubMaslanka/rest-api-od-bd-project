@@ -39,12 +39,12 @@ export class AuthService {
 		return tokens;
 	}
 
-	public async signIn(data: AuthDto): Promise<ReturnType<typeof this.getTokens>> {
+	public async signIn(signInAuthDto: AuthDto): Promise<ReturnType<typeof this.getTokens>> {
 		// Check if user exists
-		const user = await this.usersService.findOneByEmail(data.email);
+		const user = await this.usersService.findOneByEmail(signInAuthDto.email);
 		if (!user) throw new BadRequestException("User does not exist");
 
-		const passwordMatches = await bcrypt.compare(data.password, user.password);
+		const passwordMatches = await bcrypt.compare(signInAuthDto.password, user.password);
 		if (!passwordMatches) throw new BadRequestException("Password is incorrect");
 
 		const tokens = await this.getTokens({ sub: user.id, email: user.email, role: user.role });

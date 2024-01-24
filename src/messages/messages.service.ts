@@ -1,26 +1,46 @@
-import { Injectable } from "@nestjs/common";
+import { v4 as uuid } from "uuid";
+import { ForbiddenException, Injectable, Logger } from "@nestjs/common";
+import { UsersService } from "@/users/users.service";
+import { TicketsService } from "@/tickets/tickets.service";
+import { MessagesRepository } from "./messages.repository";
 import { CreateMessageDto } from "./dto/create-message.dto";
 import { UpdateMessageDto } from "./dto/update-message.dto";
+import { Message } from "./entities/message.entity";
 
 @Injectable()
 export class MessagesService {
-	create(createMessageDto: CreateMessageDto) {
-		return "This action adds a new message";
+	protected readonly logger = new Logger(MessagesService.name);
+
+	constructor(
+		private readonly messagesRepository: MessagesRepository,
+		private readonly usersService: UsersService,
+		private readonly ticketsService: TicketsService
+	) {}
+
+	async create(createMessageDto: CreateMessageDto, userId: string) {
+		const user = await this.usersService.findOne(userId);
+		if (!user) {
+			throw new ForbiddenException("User not found");
+		}
+
+		const message = new Message({ ...createMessageDto, id: uuid(), user: user });
+		return this.messagesRepository.create(message);
 	}
 
 	findAll() {
-		return `This action returns all messages`;
+		return this.messagesRepository.find({});
 	}
 
-	findOne(id: number) {
-		return `This action returns a #${id} message`;
+	async findOne(id: string) {
+		const message = await this.messagesRepository.findOne({ id });
+		return message;
 	}
 
-	update(id: number, updateMessageDto: UpdateMessageDto) {
-		return `This action updates a #${id} message`;
+	update(id: string, updateMessageDto: UpdateMessageDto) {
+		return this.messagesRepository.findAndUpdate({ id }, updateMessageDto);
 	}
 
-	remove(id: number) {
-		return `This action removes a #${id} message`;
+	remove(id: string) {
+		return this.messagesRepository.findOneAndDelete({ id });
 	}
 }

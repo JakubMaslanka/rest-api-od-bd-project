@@ -1,8 +1,8 @@
-import { Injectable, Logger } from "@nestjs/common";
-import { AbstractRepository } from "src/common/database/abstract.repository";
-import { Ticket } from "./entities/ticket.entity";
-import { InjectRepository } from "@nestjs/typeorm";
 import { EntityManager, Repository } from "typeorm";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Injectable, Logger } from "@nestjs/common";
+import { AbstractRepository } from "@/common";
+import { Ticket } from "./entities/ticket.entity";
 
 @Injectable()
 export class TicketsRepository extends AbstractRepository<Ticket> {
@@ -10,9 +10,17 @@ export class TicketsRepository extends AbstractRepository<Ticket> {
 
 	constructor(
 		@InjectRepository(Ticket)
-		ticketsRepository: Repository<Ticket>,
+		readonly ticketsRepository: Repository<Ticket>,
 		entityManager: EntityManager
 	) {
 		super(ticketsRepository, entityManager);
+	}
+
+	async findTicketWithDetails(ticketId: string): Promise<Ticket | undefined> {
+		return this.ticketsRepository
+			.createQueryBuilder("ticket")
+			.leftJoinAndSelect("ticket.messages", "message")
+			.where("ticket.id = :ticketId", { ticketId })
+			.getOne();
 	}
 }
